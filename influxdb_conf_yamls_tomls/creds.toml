@@ -1,0 +1,5 @@
+[influx2]
+  url = "http://influxdb:8086"
+  token = "random string"
+  org = "org_name"
+  active = true
