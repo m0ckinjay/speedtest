@@ -23,13 +23,13 @@ Grafana has to run as the user owning the working directory
 
 There are two networks. The logic behind their existence is, there are front-facing containers and there are those in the back-end.
 
-![Image displaying the compartmentalized network structure](img/Networks.png)
+![Image displaying the compartmentalized network structure](./img/Networks.png)
 
 
 
 ## Grafana and InfluxDB
 
-![Screenshot of a Grafana Dashboard with upload and download speed values](img/Grafana.png)
+![Screenshot of a Grafana Dashboard with upload and download speed values](./img/Grafana.png)
 
 
 To configure Grafana, we need to add InfluxDB as a data source and create a dashboard with the upload and download values. You can find a demo dashboard configuration in the [/Grafana](/Grafana) folder.
