@@ -1,0 +1,129 @@
+services:
+  speedtest:
+      container_name: nwm_speedtest
+      build:
+        context: .
+        dockerfile: Dockerfile
+      restart: always
+      environment:
+        - LOOP=${LOOP}
+        - LOOP_DELAY=${LOOP_DELAY}
+        - _SAVE=${_SAVE}
+
+      privileged: true # Needed for 'sleep' in the loop
+      volumes:
+        - $PWD/speedtest_results.txt:/opt/speedtest/speedtest_results.txt:a
+        - $PWD/ntp/ntp.conf:/etc/ntp.conf:r
+        - $PWD/influx_write:/opt/speedtest/influx_write:r
+        - $PWD/influxdb_conf_yamls_tomls:/opt/speedtest/influxdb_conf_yamls_tomls:r
+      networks:
+        backend:
+          ipv4_address: 172.2.0.2
+  
+  influxdb:
+    image: influxdb
+    container_name: nwm_influxdb
+    restart: always
+    volumes:
+        - $PWD/influxdb2_lib:/var/lib/influxdb2
+        - $PWD/influxdb2_log:/var/log/influxdb2
+        - $PWD/influxdb2_config:/etc/influxdb2
+          #ports:
+          #- 8086:8086
+    environment:
+     - DOCKER_INFLUXDB_INIT_MODE=${DOCKER_INFLUXDB_INIT_MODE}
+     - DOCKER_INFLUXDB_INIT_USERNAME=${DOCKER_INFLUXDB_INIT_USERNAME}
+     - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
+     - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
+     - DOCKER_INFLUXDB_INIT_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+     - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+     - DOCKER_INFLUXDB_INIT_TIMESTAMP_PRECISION="${DOCKER_INFLUXDB_INIT_TIMESTAMP_PRECISION}"
+    networks:
+      frontend:
+        ipv4_address: 172.1.0.3
+      backend:
+        ipv4_address: 172.2.0.3
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: nwm_grafana
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+    - GF_PATHS_CONFIG=/home/grafana/etc/grafana/grafana.ini
+    - GF_PATHS_DATA=/home/grafana/var/lib/grafana
+    - GF_PATHS_HOME=/home/grafana/usr/share/grafana
+    - GF_PATHS_LOGS=/home/grafana/var/log/grafana
+    - GF_PATHS_PLUGINS=/home/grafana/var/lib/grafana/plugins
+    - GF_PATHS_PROVISIONING=/home/grafana/etc/grafana/provisioning
+    - GF_APP_MODE=${GF_APP_MODE}
+    - GF_INSTANCE_NAME=${GF_INSTANCE_NAME}
+    - GF_SERVER_ROUTER_LOGGING=${GF_SERVER_ROUTER_LOGGING}
+    - GF_SERVER_ENABLE_GZIP=${GF_SERVER_ENABLE_GZIP}
+    - GF_ANALYTICS_REPORTING_ENABLED=${GF_ANALYTICS_REPORTING_ENABLED}
+    - GF_ANALYTICS_CHECK_FOR_UPDATES=${GF_ANALYTICS_CHECK_FOR_UPDATES}
+    - GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES=${GF_ANALYTICS_CHECK_FOR_UPDATES}
+    - GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION=${GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION}
+    - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+    - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    - GF_SECURITY_ADMIN_EMAIL=${GF_SECURITY_ADMIN_EMAIL}
+    - GF_SECURITY_SECRET_KEY=${GF_SECURITY_SECRET_KEY}
+    - GF_SECURITY_DISABLE_GRAVATAR=${GF_SECURITY_DISABLE_GRAVATAR}
+    - GF_SECURITY_DISABLE_BRUTE_FORCE_LOGIN=${GF_SECURITY_DISABLE_BRUTE_FORCE_LOGIN}
+    - GF_SECURITY_COOKIE_SAMESITE=${GF_SECURITY_COOKIE_SAMESITE}
+    - GF_SECURITY_X_XSS_PROTECTION=${GF_SECURITY_X_XSS_PROTECTION}
+    - GF_SECURITY_ALLOW_EMBEDDING=${GF_SECURITY_ALLOW_EMBEDDING}
+    - GF_SECURITY_CONTENT_SECURITY_POLICY=${GF_SECURITY_CONTENT_SECURITY_POLICY}
+    - GF_USERS_ALLOW_SIGN_UP=${GF_USERS_ALLOW_SIGN_UP}
+    - GF_USERS_ALLOW_ORG_CREATE=${GF_USERS_ALLOW_ORG_CREATE}
+    - GF_LOG_MODE=${GF_LOG_MODE}
+    - GF_LOG_LEVEL=${GF_LOG_LEVEL}
+    - GF_LOG_CONSOLE_LEVEL=${GF_LOG_CONSOLE_LEVEL}
+    - GF_LOG_CONSOLE_FORMAT=${GF_LOG_CONSOLE_FORMAT}
+    - GF_LOG_FILE_LEVEL=${GF_LOG_FILE_LEVEL}
+    - GF_LOG_FILE_FORMAT=${GF_LOG_FILE_FORMAT}
+    - GF_LOG_FILE_LOG_ROTATE=${GF_LOG_FILE_LOG_ROTATE}
+    - GF_LOG_FILE_MAX_LINES=${GF_LOG_FILE_MAX_LINES}
+    - GF_LOG_FILE_MAX_SIZE_SHIFT=${GF_LOG_FILE_MAX_SIZE_SHIFT}
+    - GF_LOG_FILE_DAILY_ROTATE=${GF_LOG_FILE_DAILY_ROTATE}
+    - GF_LOG_FILE_MAX_DAYS=${GF_LOG_FILE_MAX_DAYS}
+    - GF_AUTH_LOGIN_MAXIMUM_LIFETIME_DURATION=${GF_AUTH_LOGIN_MAXIMUM_LIFETIME_DURATION}
+    - GF_AUTH_LOGIN_MAXIMUM_INACTIVE_LIFETIME_DURATION=${GF_AUTH_LOGIN_MAXIMUM_INACTIVE_LIFETIME_DURATION}
+    - GF_SMTP_ENABLED=${GF_SMTP_ENABLED}
+    - GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS}
+    - GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME}
+    - GF_SMTP_HOST=${GF_SMTP_HOST}
+    - GF_SMTP_USER=${GF_SMTP_USER}
+    - GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
+
+    volumes:
+    - $PWD/grafana_data:/var/lib/grafana
+    - /var/lib/vnstat:/var/lib/vnstat:r
+    user: "1001"
+    # env_file:
+    #   - grafana.env
+    networks:
+     frontend:
+       ipv4_address: 172.1.0.2
+
+
+networks:
+  frontend:
+    name: custom_frontendNet
+    enable_ipv6: false
+    ipam:
+      config:
+        - subnet: 172.1.0.0/29
+  backend:
+    name: custom_backendNet
+    enable_ipv6: false
+    ipam:
+      config:
+        - subnet: 172.2.0.0/29
+
+
+
+
+
+
