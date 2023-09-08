@@ -38,6 +38,7 @@ To configure Grafana, we need to add InfluxDB as a data source and create a dash
 > **Hint:** The data source uuid must be changed when using a new data source, even if it's an influxdb data source
 
 > **Hint:** The speedtest outputs values as bytes per second. Make sure to divide all values by 125000 in your dashboard to get the Mbps values.
+> **Hint:** Influxdb retention period can be configured to retain data depending on one's needs.
 
 ### Sample flux query
 ```
