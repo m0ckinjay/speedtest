@@ -29,7 +29,8 @@ There are two networks. The logic behind their existence is, there are front-fac
 
 ## Grafana and InfluxDB
 
-![Screenshot of a Grafana Dashboard with upload and download speed values](./img/Grafana.png)
+![Screenshot of a Grafana Dashboard with upload and download speed values](https://github.com/m0ckinjay/speedtest/blob/f9305416710d3e6766f74b8c7b74a4a7f8825d46/imgs/Grafana.png)
+
 
 
 To configure Grafana, we need to add InfluxDB as a data source and create a dashboard with the upload and download values. You can find a demo dashboard configuration in the [/Grafana](/Grafana) folder.
