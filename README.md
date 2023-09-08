@@ -23,7 +23,7 @@ Grafana has to run as the user owning the working directory
 
 There are two networks. The logic behind their existence is, there are front-facing containers and there are those in the back-end.
 
-![Image displaying the compartmentalized network structure](https://github.com/m0ckinjay/speedtest/blob/master/imgs/Grafana.png)
+![Image displaying the compartmentalized network structure](https://github.com/m0ckinjay/speedtest/blob/0024b6217ed07f2619d8269d5cb40f0106314379/imgs/Networks.png)
 
 
 
